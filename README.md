@@ -4,7 +4,7 @@
 The goal of this project is to process and analyze data collected by the SWR (Südwestrundfunk) in context of their [#besserRadfahren](https://www.swr.de/radfahren/besser-radfahren-im-suedwesten-106.html) campaign. The data was gathered by collecting complaints from cyclists in the south-west of Germany (Baden-Württemberg and Rheinland-Pfalz). The resulting dataset can be sccessed [here](https://www.govdata.de/web/guest/daten/-/details/besserradfahren-swr-umfrage) through _GovData.de_.
 The pre-processing and short analysis focus on the state of Baden-Württemberg and in particular on its capital city, Stuttgart.
 
-The analysis is performed in R and presented in a R markdown format.
+The analysis is performed in R and presented in an R markdown format.
 
 ## 2. Data Cleaning
 
