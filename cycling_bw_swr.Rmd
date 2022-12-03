@@ -1,0 +1,459 @@
+---
+title: "cycling_bw_swr"
+author: "vollenia"
+output: html_document
+---
+
+## 1. Preparation
+Setting up the environment.
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(readxl)
+library(writexl)
+```
+
+Loading the dataset (needs to be located in the same directory as this file).
+The open licence dataset can be downloaded through the official webpage: <https://www.govdata.de/en/web/guest/suchen/-/details/besserradfahren-swr-umfrage>.
+
+```{r import}
+# Loading file
+data <- read_excel("data/besserradfahren-alle-meldungen-datenexport-100.xlsx")
+# Converting to data frame
+df_og <- data.frame(data)
+```
+
+To get an understanding of the data we need to inspect it's structure.
+
+```{r}
+glimpse(df_og)
+```
+
+Additionally we can inspect the data frame ourselves.
+Since the data frame consists of over 10k rows, we limit our output to the first 100.
+
+```{r import}
+View(df_og[1:100,])
+```
+
+Our main takeaways from inspecting the data are:
+
+* Column _Meldungsgrund_ is described in pre-defined classes
+* Time of the event is encoded in date-time format
+* Location data is provided in form of coordinates
+* Column _nächstgelegene.Adresse_ contains city, district, state and zip code
+* Total count of an event is split between the author and the nr. of confirmations.
+
+## 2. Data Cleaning
+Since the goal of this analysis is to look only at Baden-Württemberg, we need to remove all instances that don't meet this criteria.
+Given the fact that the dataset doesn't contain this information as separate columns, this will be our starting point.
+We implement steps to separate the information form _nächstgelegene.Adresse_ into individual columns (country, zip code, state, district, city, address).
+
+The first step consists of expanding column to max nr. of elements contained within.
+
+```{r}
+add_max_len <- max(str_count(df_og$nächstgelegene.Adresse, ", ")) + 1
+df <- df_og %>% 
+  separate(nächstgelegene.Adresse,
+           into=paste('Ad', 1:add_max_len, sep="_"),
+           sep=", ")
+```
+
+Then, we combine them again into one column while reversing the order and dropping NA values. This results in "country" being moved to the left-most position in the string.
+
+```{r}
+df <- df %>% 
+  unite(nächstgelegene.Adresse, Ad_10:Ad_1, sep=", ", na.rm=TRUE)
+```
+
+Now, we are able to split the string into the final column while restricting their total nr. to our desired output.
+
+```{r}
+df <- df %>% 
+  separate(nächstgelegene.Adresse,
+           into=c("Land", "PLZ", "Bundesland", "Kreis", "Ort", "Adresse"),
+           sep=", ",
+           extra="merge")
+  
+View(df[1:100, ])
+```
+
+To double-check if our conversion was successful throughout the whole dataset we inspect the unique values within the newly created _Bundesland_ column.
+
+```{r}
+head(as.data.frame(table(df$Bundesland)) %>% 
+  arrange(-Freq), 10)
+```
+
+We can see that the conversion was successful for roughly 80% of the data. Instances where _nächstgelegene.Adresse_ was incomplete (such as a missing PLZ) resulted in a incorrect split.
+Further, we observe that _nächstgelegene.Adresse_ allowed German addresses in different languages, as is indicated by the Spanish _Baden-Wurtemberg_, French _Bade-Wurtemberg_ and the Japanese _バーデン＝ヴュルテンベルク州_.
+
+To assess the extent of the situation we take a look into the data in individual languages.
+
+```{r}
+View(df %>% filter(Bundesland == "Baden-Wurtemberg"))
+View(df %>% filter(Bundesland == "Bade-Wurtemberg"))
+View(df %>% filter(Bundesland == "バーデン＝ヴュルテンベルク州"))
+```
+
+It is likely that other languages are included in the dataset as well.
+At this point we need to draw a line and decide to exclude languages with single digit numbers of instances in the dataset. This leaves us with Spanish and French.
+
+Now we need to change _Land_ and _Bundesland_ for Spanish as well as an additional instance of _Ort_ for French.
+
+```{r}
+# Transforming columns
+df <- df %>% 
+  mutate(
+    Bundesland=case_when(
+      Bundesland %in% c("Baden-Wurtemberg","Bade-Wurtemberg") ~ "Baden-Württemberg", TRUE ~ Bundesland),
+    Ort=case_when(
+      Ort == "Saint Georges" ~ "Sankt Georgen", TRUE ~ Ort)
+  )
+# Displaying converted
+head(as.data.frame(
+  table(df$Bundesland)) %>% 
+       filter(Freq >= 10) %>% 
+       arrange(-Freq)
+     )
+
+```
+
+Now we are able to filter down to instances that happened in Baden-Württemberg.
+
+```{r}
+df <- df %>% 
+  filter(Bundesland == "Baden-Württemberg")
+
+dim(df)
+```
+
+Before moving on to _Land_, we quickly check if all zip codes in _PLZ_ have the appropriate length of 5 digits.
+
+```{r}
+all(str_length(df$PLZ) == 5 )
+```
+
+Previously, we have already observed that _Land_ contains country names in different languages. Since we've already filtered the data down to only instances from _Baden-Württemberg_, we could convert the whole column _Land_ to "Deutschland" or drop it altogether. However, knowing that we encountered incorrectly split instances before, we take an additional look.
+
+```{r}
+as.data.frame(table(df$Land)) %>% 
+  arrange(-Freq)
+```
+
+After identifying only one incorrect instance, we remove it and convert all other instances to "Deutschland".
+
+```{r}
+# Removing the incorrect instance
+df <- df[df$Land != "Deutschland Kreuzung Wolfartsweierbrücke /Ostring", ]
+# Converting all other to "Deutschland"
+df$Land <- "Deutschland"
+
+as.data.frame(table(df$Land))
+```
+
+The output shows us that we now have 8387 rows (one less then previously) and all of them are "Deutschland".
+
+Further, since we observed that the total count of an event is split between the author and the nr. of confirmations, we create a new column _Betroffene_ where we add "1" to every instance in _Bestätigungen_.
+
+```{r}
+df <- df %>% 
+  mutate(Betroffene = ifelse(is.na(Bestätigungen), 1, Bestätigungen + 1)) # Bestätigungen=NULL would remove original column
+```
+
+
+Finally, we need to split the occurring problem form the column _Meldungsgrund_ into broader and more fine-grained categories.
+
+```{r}
+df <- df %>% 
+  separate(Meldungsgrund,
+           into=c("grund_a", "grund_b"),
+           sep=": ",
+           extra="merge")
+```
+
+Taking a look at the broader categories, we see the category _Sonstige Hinweise_ that is supposed to cover instances where none of the pre-defined categories applies and each used can enter their individual problem as plain text. When inspecting these instances manually, it was observed that many instances could very well fit into the pre-defined categories. Enabling users to basically create their individual categories at will instead of forcing them to choose one pre-defined category that is most similar to their problem resulted in 898 uncategorizable instances (> 10%) from Baden-Württemberg alone.
+Further, we observe the category _Positive Meldungen_ that is intended to contain positive feedback.
+Upon manual inspection several messages from the group actually contain negative messages.
+Given that these instances are not using pre-defined categories, there is no way to check how many have been created by mistake and reduced chance for users to realize that they are about to enter "positive feedback" instead of issuing a complaint.
+
+Both categories will need to be removed.
+
+```{r}
+as.data.frame(table(df$grund_a)) %>% arrange(-Freq)
+```
+
+Removing the categories _Sonstige Hinweise_ and _Positive Meldung_.
+
+```{r}
+df <- df[!(df$grund_a %in% c("Sonstige Hinweise", "Positive Meldung")), ] # slicing with the NOT and IN operators
+
+# Inspecting result
+as.data.frame(table(df$grund_a)) %>% arrange(-Freq)
+```
+
+To double-check if all instances of positive feedback were deleted, we take an additional look at the _Status_ column.
+We can observe 4 instances that were labeled positive in the _Status_ column, however, a quick manual inspection reveals that all of them are complaint as well.
+
+```{r}
+as.data.frame(table(df$Status)) %>% arrange(-Freq)
+```
+
+Therefore, we can label the 4 wrongly classified instances as being negative as well.
+
+```{r}
+df$Status <- "negative Meldung"
+```
+
+*Insertion-START!*
+When analyzing the data for districts of Stuttgart in *Step 3*, an additional error in the original data has been discovered.
+An additional name was wrongly contained, therefore, shifting the correct names further to the right.
+This will be corrected but it is possible that the data could contain further errors. Therefore, the zip code seems to be more reliable. 
+
+```{r}
+# Creating a clean subset
+df_c <- df %>% 
+  filter(Kreis=="Aichtal") %>% 
+  separate(Adresse,
+           into=c("Ort_new", "Adresse"),
+           sep=", ",
+           extra="merge")
+df_c$Kreis <- NULL
+df_c <- df_c %>% rename("Kreis"="Ort", "Ort"="Ort_new")
+  
+# Replacing data int the big dataframe with values from the clean subset
+df$Kreis[match(df_c$ID, df$ID)] <- df_c$Kreis
+df$Ort[match(df_c$ID, df$ID)] <- df_c$Ort
+df$Adresse[match(df_c$ID, df$ID)] <- df_c$Adresse
+```
+
+*Insertion-END!*
+
+Nearing the end of our data cleaning step, we reduce the data frame to only columns we are intending to use going forward.
+
+```{r}
+df_bw <- df %>% 
+  select(ID,
+         #Status,
+         #Land,
+         PLZ,
+         #Bundesland,
+         Kreis,
+         Ort,                   
+         #Adresse,
+         grund_a,
+         grund_b,
+         Zeitpunkt.der.Meldung,
+         #weitere.Angaben,
+         #Dateien,
+         lat,
+         lon,
+         #Bestätigungen,
+         Betroffene)
+
+View(df_bw[1:100, ])
+```
+
+Finally, we filter instances where any of our relevant columns contains missing values.
+
+```{r}
+df_bw <- df_bw[rowSums(is.na(df_bw)) == 0, ]
+```
+
+Now, we can export our clean dataset as an .xlsx file for later use.
+
+```{r}
+write_xlsx(df_bw, "data/cycling_bw_clean.xlsx")
+```
+
+## 3. Analysis for Stuttgart
+
+We'll conduct a short analysis that will focus on Stuttgart and investigate the main categories of complaints.
+The 
+
+* Stuttgart vs. Baden-Württemberg
+* Stuttgart by (inner) city districts
+* Timeline of complaints in Stuttgart (all districts)
+* Top 5 largest cities by population in Baden-Württemberg (including Stuttgart)
+
+As preparation, we determine the time window that is covered by our clean dataset
+
+```{r}
+time_window <- as.Date(df_bw$Zeitpunkt.der.Meldung)
+time_window <- paste(format(time_window[1], "%d.%b.%Y"), "-", format(rev(time_window)[1], "%d.%b.%Y"))
+time_window
+```
+
+#### 3.1 Stuttgart vs. Baden-Württemberg
+
+Creating summaries for Stuttgart and Baden-Württemberg in regard to main categories of complaints.
+
+```{r}
+# Creating a summary for Stuttgart
+s_grund_a <- df_bw %>% 
+  filter(Kreis=="Stuttgart") %>% 
+  group_by(grund_a) %>% 
+  summarise(Personen=sum(Betroffene))
+s <- sum(s_grund_a$Personen)
+s_grund_a <- s_grund_a %>% mutate(Stuttgart = round(Personen / s * 100, 2), Personen=NULL)
+
+# Creating a summary for BW
+bw_grund_a <- df_bw %>% 
+  group_by(grund_a) %>% 
+  summarise(Personen=sum(Betroffene)) %>% 
+  mutate(BW=round(Personen / sum(Personen) * 100, 2), Personen=NULL)
+
+# Merging
+s_bw <- merge(s_grund_a, bw_grund_a)
+s_bw
+```
+
+Plotting a chart that incorporates both summaries.
+
+```{r}
+pivot_longer(s_bw, Stuttgart:BW) %>% 
+  ggplot(aes(x=value,
+             y=reorder(grund_a, value),
+             fill=name)) +
+  geom_bar(stat="identity", position="dodge", width=0.7, alpha=0.9) +
+  scale_fill_manual(values=c("#F9DD16", "#000000"),
+                    name=NULL) +
+  theme(legend.position="top", plot.caption=element_text(size=8)) +
+  labs(title="Baden-Württemberg vs. Stuttgart",
+       subtitle="Probleme der Radfahrer nach Kategorie",
+       caption=time_window,
+       x="Anteil (%)",
+       y="Kategorie")
+
+#ggsave(path="images", filename="1_bw_vs_stuttgart.png", width=8, height=4, dpi=400)
+```
+
+#### 3.2 Stuttgart: Inner City Districts
+
+It is also of interest to look at the individual district of Stuttgart.
+
+We limit the number to the 5 inner-city districts.
+
+```{r}
+s_dist <- df_bw %>% 
+  filter(Ort %in% c("Stuttgart-Mitte",
+                    "Stuttgart-Nord",
+                    "Stuttgart-Ost",
+                    "Stuttgart-Süd",
+                    "Stuttgart-West")) %>% 
+  group_by(Ort, grund_a) %>% 
+  summarise(Personen=sum(Betroffene))
+```
+
+Plotting a chart for the selected districts.
+
+```{r}
+clr <- c("#C8392B", "#489FD8", "#E3BD3F", "#205093", "#42954A")
+
+s_dist %>% 
+  ggplot(aes(x=reorder(Ort, -Personen),
+             y=Personen,
+             fill=grund_a)) +
+  geom_bar(stat="identity", position="stack", width=0.6) +
+  scale_fill_manual(values=clr, name=NULL) +
+  theme(plot.caption=element_text(size=8)) +
+  labs(title="Stuttgart: Innere Stadtbezirke",
+       subtitle="Probleme der Radfahrer nach Kategorie",
+       caption=time_window,
+       x="Bezirk",
+       y="Betroffene Personen")
+
+#ggsave(path="images", filename="2_stuttgart_inner_dist.png", width=8, height=4, dpi=400)
+```
+
+#### 3.3 Timeline of Complaints in Districts of Stuttgart
+
+Here we'll look at the progression of complains as a *trend line*.
+
+First, we normalize the individual categories to create a universal scale.
+
+```{r}
+time_s <- df_bw %>% 
+  filter(Kreis=="Stuttgart") %>% 
+  mutate(Datum=as.Date(Zeitpunkt.der.Meldung)) %>% 
+  group_by(grund_a, Datum) %>% 
+  summarize(Personen=sum(Betroffene)) %>% 
+  mutate(Pct=round(Personen / max(Personen) * 100, 0), Personen=NULL)
+```
+
+Since not every category covers the same dates, we fill in the missing values with zeroes.
+
+```{r}
+time_s <- time_s %>% pivot_wider(names_from = Datum, values_from = Pct)
+time_s[is.na(time_s)] <- 0
+
+time_s <- pivot_longer(time_s, colnames(time_s)[2]:rev(colnames(time_s))[1], names_to="Datum", values_to="Pct")
+time_s$Datum <- as.Date(time_s$Datum)
+time_s <- time_s %>% 
+  arrange(Datum)
+```
+
+Plotting a chart with the trend lines for each category.
+
+```{r}
+time_s %>% 
+  ggplot(aes(x=Datum, y=Pct, color=grund_a)) +
+  geom_smooth(method="loess", se=FALSE) +
+  scale_color_manual(values=clr, name=NULL) +
+  theme(legend.position="top", legend.key.width=unit(8, "pt"), plot.caption=element_text(size=8)) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, NA)) +
+  labs(title="Stuttgart: Trend über 3 Monate",
+       subtitle="Probleme der Radfahrer nach Kategorie",
+       caption=time_window,
+       x="Datum",
+       y="Trend (%)")
+
+#ggsave(path="images", filename="3_stuttgart_trend.png", width=8, height=4, dpi=400)
+```
+
+#### 3.4 Top 5 largest cities by population in Baden-Württemberg
+
+As our final aspect, we'll look at the top 5 largest cities in Baden-Württemberg which will be led by Stuttgart.
+
+We convert the data from individual cities to percentages to account for the differences in population.
+
+```{r}
+regions <- df_bw %>% 
+  filter(Kreis %in% c("Stuttgart",
+                    "Mannheim",
+                    "Karlsruhe",
+                    "Freiburg im Breisgau",
+                    "Heidelberg")) %>% 
+  group_by(Kreis, grund_a) %>% 
+  summarise(Personen=sum(Betroffene)) %>% 
+  mutate(Pct=round(Personen / sum(Personen) * 100, 2))
+```
+
+Plotting a chart for the 5 selected cities and the importance of the different complaint categories.
+
+```{r}
+ord <- c("Stuttgart",
+         "Mannheim",
+         "Karlsruhe",
+         "Freiburg im Breisgau",
+         "Heidelberg")
+
+clr <- c("#C8392B", "#489FD8", "#E3BD3F", "#205093", "#42954A")
+
+regions %>% 
+  ggplot(aes(x=Pct,
+             y=fct_relevel(Kreis, rev(ord)),
+             fill=grund_a)) +
+  geom_bar(stat="identity", position="stack") +
+  scale_fill_manual(values=clr, name=NULL) +
+  theme(plot.caption=element_text(size=8)) +
+  labs(title="BW: Top 5 der bevölkerungsreichsten Städte",
+       subtitle="Probleme der Radfahrer nach Kategorie",
+       caption=time_window,
+       x="Anteil (%)",
+       y="Stadt")
+
+#ggsave(path="images", filename="4_bw_top5.png", width=8, height=4, dpi=400)
+```
+
+END
