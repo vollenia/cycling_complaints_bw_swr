@@ -14,23 +14,23 @@ The analysis is performed in R and presented in a R markdown format.
 This serves as an overview of the results from the performed analysis. Short chapters display most notable insights accompanied by some context-providing commentary.
 
 ### Baden-Württemberg vs. Stuttgart
-Having an initial objective impression of the data provides us not only with valuable insights but also allows us to develop intuition as to where we want to take the analysis. To accomplish this first step, we need to inspect the progression of publications throughout the whole year.
+The first analysis focuses on the differences between Baden-Württemberg and Stuttgart in regard to the five main categories of complaints submitted by cyclists.
 
 <p align="center">
   <img src="images/1_bw_vs_stuttgart.png" width="80%" />
 </p>
 
-Here we observe a significant degree of fluctuation in the number of publications. The yellow trend line is used to visualize this fluctuation further by performing polynomial regression on the data. Despite this fluctuation, we can observe a steady growth in productivity throughout the year as visualized by the green trend line utilizing linear regression. Inspecting this line, we can observe a substantial increase of 53.60% at the end of the year. When this analysis was originally performed using only data from January to November the prediction for the end of the year amounted to over 60%. The strong drop off in publications in December (especially in the second half of the month, which is presumably correlated with the holiday season) resulted in a downwards adjustment of the overall positive trend by around 10%.
+We can observe that for both reagions the overwhelming cause of complaints with roughly 80% is _Verkehrsführung_, the layout of cycling roads. With Stuttgart being the capital city and containging high amounts of traffic while simultaniously having a relatively weak cycling infrastructure, it is expected to have a bigger problem with _Verkehrsführung_ than the state as a whole. The same circumstances also likely result in the higher amount of _Behinderung_, obstructions on the cycling roads.
+On the other hand, _Zustand des Radwegs/der Straße_, the road conditions, seem to cause close to half as many problems in Stuttgart as in the state. However, this is likely because the cyclist in Stuttgart are forced to drive on roads intended for cars and these are mostly well maintained.
+Further, the data seems to indicate that the situation regarding _Fahrradständer_, bike parking racks, in Stuttgart is very good and significantly better than in the state.
 
 ### Inner City Districts of Stuttgart
-Viewing the reporting on news as a recurring "workweek" event throughout the year while also keeping the previously observed fluctuation in mind, it becomes of interest to inspect the contribution of individual weekdays to the overall picture. Therefore, we condense the information from the whole year into a one week representation.
+Inspecting the five innter city districts of Stuttgart, we observe that the most problematic district are the city center and the south. While some aspects, such as the road layout and the road conditions are almost identical, there are significant differences in the other categories. Most notably, in the amount of obstructions where the situation in the city center is more than twice as bad as in the south. On the other hand, _Schilder/Markierung/Beleuchtung_, the road signs/markings/illumination seems to be, by far, the worst the the south of the city.
 
 <p align="center">
   <img src="images/2_stuttgart_inner_dist.png" width="80%" />
 </p>
  
-Here, we make the most notable observation when inspecting the regular workdays and the weekend. Monday through Friday display a slightly variating mean of around 10 to 11 and an identical median of 10. When moving to the weekend, we observe a significant decrease to a mean of 6 to 7 and a median of 7 for Saturday and 6 for Sunday as well as an overall decrease in publications. Additionally, we see an overall low occurrence of outliers which is, however, more present on the weekend.
-
 ### Progression of Complaints over Time in Stuttgart
 
 <p align="center">
