@@ -7,8 +7,13 @@ The pre-processing and short analysis focus on the state of Baden-Württemberg a
 The analysis is performed in R and presented in an R markdown format.
 
 ## 2. Data Cleaning
+To achieve the desired shape and quality of data the described dataset needed to undergo several data cleaning steps. All of these steps are included and documented in the R markdown file. What follows is a short summary of the most intresting steps taken.
 
+Arguably the most important chalange in this context was the extraction of state, district and city names as well as zip codes for each entry in the original dataset where all of them were part of a single text string. Therefore, this text string needed to be split in a multi-step process.
 
+While this process was largely a success it brought some additional challanges with it. One of those chalanges was that e.g. the state names resembled the same names in different languages. These includes variations of Baden-Württemberg in Spanisch (_Baden-Wurtemberg_), French (_Bade-Wurtemberg_) and Japanese (_バーデン＝ヴュルテンベルク州_), among others.
+
+Other steps included common data cleaning such as the removal of zeroes and outliers. This also included instances where the previously mentioned split didn't deliver ther desired results due to missing values in the original dataset. 
 
 ## 3. Insights
 This serves as an overview of the results from the performed analysis. Short chapters display most notable insights accompanied by some context-providing commentary.
