@@ -1,19 +1,19 @@
 # cycling_complaints_bw_swr
 
-## Summary
+## 1. Summary
 The goal of this project is to process and analyze data collected by the SWR (Südwestrundfunk) in context of their [#besserRadfahren](https://www.swr.de/radfahren/besser-radfahren-im-suedwesten-106.html) campaign. The data was gathered by collecting complaints from cyclists in the south-west of Germany (Baden-Württemberg and Rheinland-Pfalz). The resulting dataset can be sccessed [here](https://www.govdata.de/web/guest/daten/-/details/besserradfahren-swr-umfrage) through _GovData.de_.
 The pre-processing and short analysis focus on the state of Baden-Württemberg and in particular on it's capital city, Stuttgart.
 
 The analysis is performed in R and presented in a R markdown format.
 
-## Data Cleaning
+## 2. Data Cleaning
 
 
 
-## Insights
+## 3. Insights
 This serves as an overview of the results from the performed analysis. Short chapters display most notable insights accompanied by some context-providing commentary.
 
-### Baden-Württemberg vs. Stuttgart
+### 3.1 Baden-Württemberg vs. Stuttgart
 The first analysis focuses on the differences between Baden-Württemberg and Stuttgart in regard to the five main categories of complaints submitted by cyclists.
 
 <p align="center">
@@ -24,22 +24,22 @@ We can observe that for both reagions the overwhelming cause of complaints with 
 On the other hand, _Zustand des Radwegs/der Straße_, the road conditions, seem to cause close to half as many problems in Stuttgart as in the state. However, this is likely because the cyclist in Stuttgart are forced to drive on roads intended for cars and these are mostly well maintained.
 Further, the data seems to indicate that the situation regarding _Fahrradständer_, bike parking racks, in Stuttgart is very good and significantly better than in the state.
 
-### Inner City Districts of Stuttgart
-Inspecting the five innter city districts of Stuttgart, we observe that the most problematic district are the city center and the south. While some aspects, such as the road layout and the road conditions are almost identical, there are significant differences in the other categories. Most notably, in the amount of obstructions where the situation in the city center is more than twice as bad as in the south. On the other hand, _Schilder/Markierung/Beleuchtung_, the road signs/markings/illumination seems to be, by far, the worst the the south of the city.
+### 3.2 Inner City Districts of Stuttgart
+Inspecting the five inner city districts of Stuttgart, we observe that the most problematic district are the city center and the south. While some aspects, such as the road layout and the road conditions are almost identical, there are significant differences in the other categories. Most notably, in the amount of obstructions where the situation in the city center is more than twice as bad as in the south. On the other hand, _Schilder/Markierung/Beleuchtung_, the road signs/markings/illumination seems to be, by far, the worst the the south of the city.
 
 <p align="center">
   <img src="images/2_stuttgart_inner_dist.png" width="80%" />
 </p>
  
-### Progression of Complaints over Time in Stuttgart
+### 3.3 Progression of Complaints over Time in Stuttgart
+Viewing the timeline of complaints submitted in Stuttgart, we observe an overarching trend throughout almost all categories. There is a constant increase in contributions from cyclists that culminates in a peak at around mid March and then drops off before reaching plateau at the beginning of April. The only outlier to this behavior are the obstructions on the roads which display a contant downward trend.
+Disregarding the outlier and speculating about the reasons behind this overarching trend, it would be wishful thinking and very unlikely that all of the reported problems were resolved in a matter of weeks. Likely, the majority of the problematic spots across the city have just been mapped by the cyclists and ,as change moves slowly, only a handful of those prblems has been resolved.
 
 <p align="center">
   <img src="images/3_stuttgart_trend.png" width="80%" />
 </p>
 
-Observing the weekly publications by total counts, we get a more precise picture of the decrease in publications towards the weekend. While the counts don't drop below the 500 mark during the regular work week, they remain between low to mid 300s on the weekend.
-
-### Five Largest Cities in Baden-Württemberg
+### 3.4 Five Largest Cities in Baden-Württemberg
 
 To get a sense of how these publications came to be, we need to inspect their authorship. Given the large number of journalists working for CNN, we don't want to look at every single one individually but group them together. In this context it seems of particular interest to examine the spirit of collaboration in a journalistic environment. Therefore, we make the distinction between a single person worked on an article and a group of people contributing to its content. Additionally, articles which don't contain a reference and where the author is therefore unknown are also included.
 
