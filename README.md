@@ -18,11 +18,11 @@ Other steps included common data cleaning such as the removal of zeroes and outl
 ## 3. Insights
 This serves as an overview of the results from the performed analysis. Short chapters display most notable insights accompanied by some context-providing commentary.
 
-### 3.1 Baden-Württemberg vs. Stuttgart
+### 3.1 Stuttgart vs. Baden-Württemberg
 The first analysis focuses on the differences between Baden-Württemberg and Stuttgart in regard to the five main categories of complaints submitted by cyclists.
 
 <p align="center">
-  <img src="images/1_bw_vs_stuttgart.png" width="80%" />
+  <img src="images/1_stuttgart_vs_bw.png" width="80%" />
 </p>
 
 We can observe that for both reagions the overwhelming cause of complaints with roughly 80% is _Verkehrsführung_, the layout of cycling roads. With Stuttgart being the capital city and containging high amounts of traffic while simultaniously having a relatively weak cycling infrastructure, it is expected to have a bigger problem with _Verkehrsführung_ than the state as a whole. The same circumstances also likely result in the higher amount of _Behinderung_, obstructions on the cycling roads.
