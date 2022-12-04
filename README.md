@@ -1,19 +1,19 @@
 # cycling_complaints_bw_swr
 
 ## 1. Summary
-The goal of this project is to process and analyze data collected by the SWR (Südwestrundfunk) in context of their [#besserRadfahren](https://www.swr.de/radfahren/besser-radfahren-im-suedwesten-106.html) campaign. The data was gathered by collecting complaints from cyclists in the south-west of Germany (Baden-Württemberg and Rheinland-Pfalz). The resulting dataset can be sccessed [here](https://www.govdata.de/web/guest/daten/-/details/besserradfahren-swr-umfrage) through _GovData.de_.
+The goal of this project is to process and analyze data collected by the SWR (Südwestrundfunk) in context of their [#besserRadfahren](https://www.swr.de/radfahren/besser-radfahren-im-suedwesten-106.html) campaign. The data was gathered by collecting complaints from cyclists in the south-west of Germany (Baden-Württemberg and Rheinland-Pfalz). The resulting dataset can be accessed [here](https://www.govdata.de/web/guest/daten/-/details/besserradfahren-swr-umfrage) through _GovData.de_.
 The pre-processing and short analysis focus on the state of Baden-Württemberg and in particular on its capital city, Stuttgart.
 
 The analysis is performed in R and presented in an R markdown format.
 
 ## 2. Data Cleaning
-To achieve the desired shape and quality of data the described dataset needed to undergo several data cleaning steps. All of these steps are included and documented in the R markdown file. What follows is a short summary of the most intresting steps taken.
+To achieve the desired shape and quality of data the described dataset needed to undergo several data cleaning steps. All of these steps are included and documented in the R markdown file. What follows is a short summary of the most interesting steps taken.
 
-Arguably the most important chalange in this context was the extraction of state, district and city names as well as zip codes for each entry in the original dataset where all of them were part of a single text string. Therefore, this text string needed to be split in a multi-step process.
+Arguably, the most important challenge in this context was the extraction of state, district and city names as well as zip codes for each entry in the original dataset where all of them were part of a single text string. Therefore, this text string needed to be split in a multi-step process.
 
-While this process was largely a success it brought some additional challanges with it. One of those chalanges was that e.g. the state names resembled the same names in different languages. These includes variations of Baden-Württemberg in Spanisch (_Baden-Wurtemberg_), French (_Bade-Wurtemberg_) and Japanese (_バーデン＝ヴュルテンベルク州_), among others.
+While this process was largely a success it brought some additional challenges with it. One of those challenges was that e.g. the state names resembled the same names in different languages. These includes variations of Baden-Württemberg in Spanisch (_Baden-Wurtemberg_), French (_Bade-Wurtemberg_) and Japanese (_バーデン＝ヴュルテンベルク州_), among others.
 
-Other steps included common data cleaning such as the removal of zeroes and outliers. This also included instances where the previously mentioned split didn't deliver ther desired results due to missing values in the original dataset. 
+Other steps included common data cleaning such as the removal of zeroes and outliers. This also included instances where the previously mentioned split didn't deliver the desired results due to missing values in the original dataset. 
 
 ## 3. Insights
 This serves as an overview of the results from the performed analysis. Short chapters display most notable insights accompanied by some context-providing commentary.
