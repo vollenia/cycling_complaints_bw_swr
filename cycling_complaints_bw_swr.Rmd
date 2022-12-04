@@ -316,16 +316,21 @@ pivot_longer(s_bw, Stuttgart:BW) %>%
              y=reorder(grund_a, value),
              fill=name)) +
   geom_bar(stat="identity", position="dodge", width=0.7, alpha=0.9) +
-  scale_fill_manual(values=c("#F9DD16", "#000000"),
+  scale_fill_manual(breaks=c("Stuttgart", "BW"),
+                    values=c("#000000", "#F9DD16"),
                     name=NULL) +
-  theme(legend.position="top", plot.caption=element_text(size=8)) +
-  labs(title="Baden-Württemberg vs. Stuttgart",
+  theme(legend.position="top",
+        legend.justification="left",
+        plot.caption=element_text(size=8),
+        plot.background = element_rect(fill = "grey98"),
+        legend.background = element_rect(fill = "grey98")) +
+  labs(title="Stuttgart vs. Baden-Württemberg",
        subtitle="Probleme der Radfahrer nach Kategorie",
        caption=time_window,
        x="Anteil (%)",
        y="Kategorie")
 
-#ggsave(path="images", filename="1_bw_vs_stuttgart.png", width=8, height=4, dpi=400)
+#ggsave(path="images", filename="1_stuttgart_vs_bw.png", width=8, height=4, dpi=400)
 ```
 
 #### 3.2 Stuttgart: Inner City Districts
@@ -356,7 +361,9 @@ s_dist %>%
              fill=grund_a)) +
   geom_bar(stat="identity", position="stack", width=0.6) +
   scale_fill_manual(values=clr, name=NULL) +
-  theme(plot.caption=element_text(size=8)) +
+  theme(plot.caption=element_text(size=8),
+        plot.background = element_rect(fill = "grey98"),
+        legend.background = element_rect(fill = "grey98")) +
   labs(title="Stuttgart: Innere Stadtbezirke",
        subtitle="Probleme der Radfahrer nach Kategorie",
        caption=time_window,
@@ -400,7 +407,11 @@ time_s %>%
   ggplot(aes(x=Datum, y=Pct, color=grund_a)) +
   geom_smooth(method="loess", se=FALSE) +
   scale_color_manual(values=clr, name=NULL) +
-  theme(legend.position="top", legend.key.width=unit(8, "pt"), plot.caption=element_text(size=8)) +
+  theme(legend.position="top",
+        legend.key.width=unit(8, "pt"),
+        plot.caption=element_text(size=8),
+        plot.background = element_rect(fill = "grey98"),
+        legend.background = element_rect(fill = "grey98")) +
   scale_y_continuous(expand = c(0, 0), limits = c(0, NA)) +
   labs(title="Stuttgart: Trend über 3 Monate",
        subtitle="Probleme der Radfahrer nach Kategorie",
@@ -446,7 +457,9 @@ regions %>%
              fill=grund_a)) +
   geom_bar(stat="identity", position="stack") +
   scale_fill_manual(values=clr, name=NULL) +
-  theme(plot.caption=element_text(size=8)) +
+  theme(plot.caption=element_text(size=8),
+        plot.background = element_rect(fill = "grey98"),
+        legend.background = element_rect(fill = "grey98")) +
   labs(title="BW: Top 5 der bevölkerungsreichsten Städte",
        subtitle="Probleme der Radfahrer nach Kategorie",
        caption=time_window,
