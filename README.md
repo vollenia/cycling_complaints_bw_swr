@@ -38,7 +38,7 @@ Inspecting the five inner city districts of Stuttgart, we observe that the most 
  
 ### 3.3 Progression of Complaints over Time in Stuttgart
 Viewing the timeline of complaints submitted in Stuttgart, we observe an overarching trend throughout almost all categories. There is a constant increase in contributions from cyclists that culminates in a peak at around mid March and then drops off before reaching plateau at the beginning of April. The only outlier to this behavior are the obstructions on the roads which display a constant downward trend.
-Disregarding the outlier and speculating about the reasons behind this overarching trend, it would be wishful thinking and very unlikely that all of the reported problems were resolved in a matter of weeks. Likely, the majority of the problematic spots across the city have just been mapped by the cyclists and ,as change moves slowly, only a handful of those problems has been resolved.
+Disregarding the outlier and speculating about the reasons behind this overarching trend, it would be wishful thinking and very unlikely that all of the reported problems were resolved in a matter of weeks. Likely, the majority of the problematic spots across the city have just been mapped by the cyclists and only a handful of those problems has been resolved.
 
 <p align="center">
   <img src="images/3_stuttgart_trend.png" width="80%" />
