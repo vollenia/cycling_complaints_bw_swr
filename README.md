@@ -30,7 +30,7 @@ On the other hand, _Zustand des Radwegs/der Straße_, the road conditions, seem 
 Further, the data seems to indicate that the situation regarding _Fahrradständer_, bike parking racks, in Stuttgart is very good and significantly better than in the state.
 
 ### 3.2 Inner City Districts of Stuttgart
-Inspecting the five inner city districts of Stuttgart, we observe that the most problematic district are the city center and the south. While some aspects, such as the road layout and the road conditions are almost identical, there are significant differences in the other categories. Most notably, in the amount of obstructions where the situation in the city center is more than twice as bad as in the south. On the other hand, _Schilder/Markierung/Beleuchtung_, the road signs/markings/illumination seems to be, by far, the worst in the south of the city.
+Inspecting the five inner city districts of Stuttgart, we observe that the most problematic districts are the city center and the south. While some aspects, such as the road layout and the road conditions are almost identical, there are significant differences in the other categories. Most notably, in the amount of obstructions where the situation in the city center is more than twice as bad as in the south. On the other hand, _Schilder/Markierung/Beleuchtung_, the road signs/markings/illumination seems to be, by far, the worst in the south of the city.
 
 <p align="center">
   <img src="images/2_stuttgart_inner_dist.png" width="80%" />
