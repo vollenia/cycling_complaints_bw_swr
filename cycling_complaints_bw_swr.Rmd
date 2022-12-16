@@ -1,7 +1,7 @@
 ---
 title: "cycling_complaints_bw_swr"
 author: "vollenia"
-output: rmarkdown::github_document
+output: html_document
 ---
 
 ## 1. Preparation
