@@ -469,7 +469,7 @@ pivot_longer(s_bw, Stuttgart:BW) %>%
         plot.background = element_rect(fill = "grey98"),
         legend.background = element_rect(fill = "grey98")) +
   labs(title="Stuttgart vs. Baden-Württemberg",
-       subtitle="Probleme der Radfahrer nach Kategorie",
+       subtitle="Probleme der Radfahrenden nach Kategorie",
        caption=time_window,
        x="Anteil (%)",
        y="Kategorie")
@@ -509,7 +509,7 @@ s_dist %>%
         plot.background = element_rect(fill = "grey98"),
         legend.background = element_rect(fill = "grey98")) +
   labs(title="Stuttgart: Innere Stadtbezirke",
-       subtitle="Probleme der Radfahrer nach Kategorie",
+       subtitle="Probleme der Radfahrenden nach Kategorie",
        caption=time_window,
        x="Bezirk",
        y="Betroffene Personen")
@@ -558,7 +558,7 @@ time_s %>%
         legend.background = element_rect(fill = "grey98")) +
   scale_y_continuous(expand = c(0, 0), limits = c(0, NA)) +
   labs(title="Stuttgart: Trend über 3 Monate",
-       subtitle="Probleme der Radfahrer nach Kategorie",
+       subtitle="Probleme der Radfahrenden nach Kategorie",
        caption=time_window,
        x="Datum",
        y="Trend (%)")
@@ -605,7 +605,7 @@ regions %>%
         plot.background = element_rect(fill = "grey98"),
         legend.background = element_rect(fill = "grey98")) +
   labs(title="BW: Top 5 der bevölkerungsreichsten Städte",
-       subtitle="Probleme der Radfahrer nach Kategorie",
+       subtitle="Probleme der Radfahrenden nach Kategorie",
        caption=time_window,
        x="Anteil (%)",
        y="Stadt")
